@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block page_title %}Admin Dashboard{% endblock %}
+{% block content %}
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="number">{{ total_resources }}</div>
+            <div class="label"><i class="fas fa-boxes me-1"></i>Total Resources</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card" style="border-left-color:#17a2b8;">
+            <div class="number" style="color:#17a2b8;">{{ total_bookings }}</div>
+            <div class="label"><i class="fas fa-calendar me-1"></i>Total Bookings</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card" style="border-left-color:#ffc107;">
+            <div class="number" style="color:#ffc107;">{{ pending_bookings }}</div>
+            <div class="label"><i class="fas fa-clock me-1"></i>Pending Approval</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card" style="border-left-color:#28a745;">
+            <div class="number" style="color:#28a745;">{{ approved_bookings }}</div>
+            <div class="label"><i class="fas fa-check-circle me-1"></i>Approved</div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card p-4 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">Recent Booking Requests</h5>
+                <a href="{% url 'admin_bookings' %}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead><tr><th>Student</th><th>Resource</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
+                    <tbody>
+                        {% for b in recent_bookings %}
+                        <tr>
+                            <td>{{ b.user.get_full_name|default:b.user.username }}</td>
+                            <td>{{ b.resource.name }}</td>
+                            <td>{{ b.date }}</td>
+                            <td><span class="badge badge-{{ b.status }}">{{ b.get_status_display }}</span></td>
+                            <td>
+                                {% if b.status == 'pending' %}
+                                <a href="{% url 'admin_booking_detail' b.pk %}" class="btn btn-sm btn-primary">Review</a>
+                                {% else %}—{% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-4">
+            <h5 class="fw-bold mb-3">Top Resources</h5>
+            {% for r in resource_usage %}
+            <div class="d-flex justify-content-between align-items-center mb-2 p-2 rounded" style="background:#f8f9fa;">
+                <div>
+                    <div class="fw-semibold small">{{ r.name }}</div>
+                    <div class="text-muted" style="font-size:0.75rem;">{{ r.get_resource_type_display }}</div>
+                </div>
+                <span class="badge bg-primary rounded-pill">{{ r.booking_count }} bookings</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

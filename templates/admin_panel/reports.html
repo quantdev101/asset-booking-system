@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}Reports{% endblock %}
+{% block page_title %}Usage Reports{% endblock %}
+{% block content %}
+
+<div class="card p-4 mb-4">
+    <h5 class="fw-bold mb-4">Resource Usage Summary</h5>
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr><th>Resource</th><th>Type</th><th>Location</th><th>Total Bookings</th><th>Approved</th></tr>
+            </thead>
+            <tbody>
+                {% for r in resource_usage %}
+                <tr>
+                    <td><strong>{{ r.name }}</strong></td>
+                    <td>{{ r.get_resource_type_display }}</td>
+                    <td>{{ r.location }}</td>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            {{ r.total_bookings }}
+                            <div class="progress flex-grow-1" style="height:6px;">
+                                <div class="progress-bar" style="width:{{ r.total_bookings }}0%; background:#1a3c6e;"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="badge bg-success">{{ r.approved_bookings }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card p-4">
+    <h5 class="fw-bold mb-4">Bookings by Month</h5>
+    <div class="table-responsive">
+        <table class="table">
+            <thead><tr><th>Year</th><th>Month</th><th>Total Bookings</th></tr></thead>
+            <tbody>
+                {% for m in monthly_bookings %}
+                <tr>
+                    <td>{{ m.date__year }}</td>
+                    <td>{{ m.date__month }}</td>
+                    <td>{{ m.count }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="3" class="text-center text-muted">No data yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

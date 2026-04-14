@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Student Dashboard{% endblock %}
+{% block content %}
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="number">{{ stats.total }}</div>
+            <div class="label"><i class="fas fa-calendar me-1"></i>Total Bookings</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card" style="border-left-color: #ffc107;">
+            <div class="number" style="color:#ffc107;">{{ stats.pending }}</div>
+            <div class="label"><i class="fas fa-clock me-1"></i>Pending</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card" style="border-left-color: #28a745;">
+            <div class="number" style="color:#28a745;">{{ stats.approved }}</div>
+            <div class="label"><i class="fas fa-check me-1"></i>Approved</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card" style="border-left-color: #dc3545;">
+            <div class="number" style="color:#dc3545;">{{ stats.rejected }}</div>
+            <div class="label"><i class="fas fa-times me-1"></i>Rejected</div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card p-4 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">Recent Bookings</h5>
+                <a href="{% url 'my_bookings' %}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            {% if my_bookings %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead><tr><th>Resource</th><th>Date</th><th>Time</th><th>Status</th></tr></thead>
+                    <tbody>
+                        {% for b in my_bookings %}
+                        <tr>
+                            <td>{{ b.resource.name }}</td>
+                            <td>{{ b.date }}</td>
+                            <td>{{ b.start_time|time:"H:i" }} – {{ b.end_time|time:"H:i" }}</td>
+                            <td><span class="badge badge-{{ b.status }}">{{ b.get_status_display }}</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center text-muted py-4">
+                <i class="fas fa-calendar-times fa-3x mb-3 d-block" style="color:#ddd;"></i>
+                No bookings yet. <a href="{% url 'resources' %}">Browse resources</a> to get started!
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-4">
+            <h5 class="fw-bold mb-3">Quick Book</h5>
+            <p class="text-muted small">Available resources you can book right now.</p>
+            {% for r in resources|slice:":4" %}
+            <div class="d-flex align-items-center justify-content-between mb-2 p-2 rounded" style="background:#f8f9fa;">
+                <div>
+                    <div class="fw-semibold small">{{ r.name }}</div>
+                    <div class="text-muted" style="font-size:0.75rem;">{{ r.location }}</div>
+                </div>
+                <a href="{% url 'book_resource' r.pk %}" class="btn btn-sm btn-primary">Book</a>
+            </div>
+            {% endfor %}
+            <a href="{% url 'resources' %}" class="btn btn-outline-primary w-100 mt-2">
+                <i class="fas fa-search me-2"></i>Browse All
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
