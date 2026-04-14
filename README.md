@@ -5,9 +5,9 @@ A web application that allows students to book university resources
 (labs, equipment, meeting rooms) and administrators to manage availability and view usage reports.
 
 ## 👥 Team Members
-- Member 1 - [Your Name]
-- Member 2 - [Name]
-- Member 3 - [Name]
+- Member 1 - Lavin Dharmathilake 236029B
+- Member 2 - Chenali Ranawana 236109V
+- Member 3 - Omindu Perera 236097E
 
 ## ⚙️ Tech Stack
 - Backend: Django (Python)
