@@ -1,29 +1,88 @@
 {% extends 'base.html' %}
 {% block auth_content %}
 <div style="min-height:100vh; background: linear-gradient(135deg, #1a3c6e 0%, #2d5fa3 100%); display:flex; align-items:center; justify-content:center; padding:30px 20px;">
-    <div style="width:100%; max-width:550px;">
+    <div style="width:100%; max-width:600px;">
         <div class="text-center mb-4">
             <div style="font-size:2.5rem; color:#f0a500;"><i class="fas fa-university"></i></div>
             <h2 style="color:white; font-weight:700; margin-top:10px;">UniBook</h2>
+            <p style="color:rgba(255,255,255,0.7);">Create your student account</p>
         </div>
         <div class="card p-4">
-            <h5 class="fw-bold mb-4 text-center" style="color:#1a3c6e;">Student Registration</h5>
+            <h5 class="fw-bold mb-1 text-center" style="color:#1a3c6e;">Student Registration</h5>
+            <p class="text-center text-muted small mb-4">Fill in all fields to create your account</p>
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+            {% endif %}
+
             <form method="post">
                 {% csrf_token %}
+                <p class="fw-semibold mb-2" style="color:#1a3c6e; font-size:0.85rem; text-transform:uppercase; letter-spacing:1px;">
+                    <i class="fas fa-user me-1"></i> Personal Info
+                </p>
                 <div class="row">
-                    {% for field in form %}
                     <div class="col-md-6 mb-3">
-                        <label class="form-label fw-semibold">{{ field.label }}</label>
-                        <input type="{{ field.field.widget.input_type }}" name="{{ field.html_name }}"
-                               class="form-control {% if field.errors %}is-invalid{% endif %}"
-                               {% if field.value %}value="{{ field.value }}"{% endif %}>
-                        {% for error in field.errors %}
-                            <div class="invalid-feedback">{{ error }}</div>
-                        {% endfor %}
+                        <label class="form-label fw-semibold">First Name</label>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}<div class="text-danger small mt-1">{{ form.first_name.errors }}</div>{% endif %}
                     </div>
-                    {% endfor %}
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Last Name</label>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}<div class="text-danger small mt-1">{{ form.last_name.errors }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Email</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}<div class="text-danger small mt-1">{{ form.email.errors }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Phone</label>
+                        {{ form.phone }}
+                        {% if form.phone.errors %}<div class="text-danger small mt-1">{{ form.phone.errors }}</div>{% endif %}
+                    </div>
                 </div>
-                <button type="submit" class="btn btn-primary w-100 py-2">
+
+                <hr>
+                <p class="fw-semibold mb-2" style="color:#1a3c6e; font-size:0.85rem; text-transform:uppercase; letter-spacing:1px;">
+                    <i class="fas fa-id-card me-1"></i> Academic Info
+                </p>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Student ID</label>
+                        {{ form.student_id }}
+                        {% if form.student_id.errors %}<div class="text-danger small mt-1">{{ form.student_id.errors }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Faculty</label>
+                        {{ form.faculty }}
+                        {% if form.faculty.errors %}<div class="text-danger small mt-1">{{ form.faculty.errors }}</div>{% endif %}
+                    </div>
+                </div>
+
+                <hr>
+                <p class="fw-semibold mb-2" style="color:#1a3c6e; font-size:0.85rem; text-transform:uppercase; letter-spacing:1px;">
+                    <i class="fas fa-lock me-1"></i> Account Info
+                </p>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label fw-semibold">Username</label>
+                        {{ form.username }}
+                        {% if form.username.errors %}<div class="text-danger small mt-1">{{ form.username.errors }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label fw-semibold">Password</label>
+                        {{ form.password1 }}
+                        {% if form.password1.errors %}<div class="text-danger small mt-1">{{ form.password1.errors }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label fw-semibold">Confirm Password</label>
+                        {{ form.password2 }}
+                        {% if form.password2.errors %}<div class="text-danger small mt-1">{{ form.password2.errors }}</div>{% endif %}
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 py-2 mt-2">
                     <i class="fas fa-user-plus me-2"></i>Create Account
                 </button>
             </form>
