@@ -57,6 +57,8 @@ class StudentProfile(models.Model):
     student_id = models.CharField(max_length=20, unique=True)
     faculty = models.CharField(max_length=200)
     phone = models.CharField(max_length=20, blank=True)
+    profile_picture = models.ImageField(upload_to='profiles/', blank=True, null=True)
+    bio = models.TextField(blank=True, max_length=300)
 
     def __str__(self):
         return f"{self.user.get_full_name()} ({self.student_id})"
