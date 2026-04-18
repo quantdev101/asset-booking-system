@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% block title %}Booking Detail{% endblock %}
+{% block page_title %}Booking Detail{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+
+        <!-- Status Banner -->
+        <div class="p-3 rounded mb-4 text-center fw-bold"
+             style="{% if booking.status == 'approved' %}background:#d1edff; color:#0c5460;
+                    {% elif booking.status == 'pending' %}background:#fff3cd; color:#856404;
+                    {% elif booking.status == 'rejected' %}background:#f8d7da; color:#721c24;
+                    {% else %}background:#e2e3e5; color:#383d41;{% endif %}">
+            <i class="fas {% if booking.status == 'approved' %}fa-check-circle
+                          {% elif booking.status == 'pending' %}fa-clock
+                          {% elif booking.status == 'rejected' %}fa-times-circle
+                          {% else %}fa-ban{% endif %} me-2"></i>
+            Booking {{ booking.get_status_display }}
+        </div>
+
+        <!-- Resource Info -->
+        <div class="card mb-4">
+            {% if booking.resource.image %}
+            <img src="{{ booking.resource.image.url }}" class="card-img-top"
+                 style="height:200px; object-fit:cover;" alt="{{ booking.resource.name }}">
+            {% else %}
+            <div style="height:150px; background:linear-gradient(135deg,#1a3c6e,#2d5fa3);
+                        display:flex; align-items:center; justify-content:center; border-radius:12px 12px 0 0;">
+                <i class="fas fa-building fa-3x" style="color:rgba(255,255,255,0.5);"></i>
+            </div>
+            {% endif %}
+            <div class="card-body">
+                <h5 class="fw-bold">{{ booking.resource.name }}</h5>
+                <p class="text-muted mb-1"><i class="fas fa-map-marker-alt me-2"></i>{{ booking.resource.location }}</p>
+                <p class="text-muted mb-0"><i class="fas fa-users me-2"></i>Capacity: {{ booking.resource.capacity }}</p>
+            </div>
+        </div>
+
+        <!-- Booking Details -->
+        <div class="card p-4 mb-4">
+            <h6 class="fw-bold mb-3" style="color:#1a3c6e;">Booking Information</h6>
+            <div class="row g-3">
+                <div class="col-6">
+                    <div class="p-3 rounded text-center" style="background:#f4f6fb;">
+                        <div class="text-muted small">Date</div>
+                        <div class="fw-bold">{{ booking.date }}</div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="p-3 rounded text-center" style="background:#f4f6fb;">
+                        <div class="text-muted small">Time</div>
+                        <div class="fw-bold">{{ booking.start_time|time:"H:i" }} – {{ booking.end_time|time:"H:i" }}</div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="p-3 rounded" style="background:#f4f6fb;">
+                        <div class="text-muted small mb-1">Purpose</div>
+                        <div>{{ booking.purpose }}</div>
+                    </div>
+                </div>
+                {% if booking.admin_note %}
+                <div class="col-12">
+                    <div class="p-3 rounded" style="background:#fff3cd;">
+                        <div class="text-muted small mb-1"><i class="fas fa-comment me-1"></i>Admin Note</div>
+                        <div>{{ booking.admin_note }}</div>
+                    </div>
+                </div>
+                {% endif %}
+                <div class="col-6">
+                    <div class="p-3 rounded" style="background:#f4f6fb;">
+                        <div class="text-muted small">Submitted</div>
+                        <div class="small">{{ booking.created_at|date:"M d, Y H:i" }}</div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="p-3 rounded" style="background:#f4f6fb;">
+                        <div class="text-muted small">Last Updated</div>
+                        <div class="small">{{ booking.updated_at|date:"M d, Y H:i" }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <a href="{% url 'my_bookings' %}" class="btn btn-outline-secondary flex-grow-1">
+                <i class="fas fa-arrow-left me-2"></i>Back to Bookings
+            </a>
+            {% if booking.status == 'pending' %}
+            <form method="post" action="{% url 'cancel_booking' booking.pk %}"
+                  onsubmit="return confirm('Cancel this booking?')">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-times me-1"></i>Cancel Booking
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
