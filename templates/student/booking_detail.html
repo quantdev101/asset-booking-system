@@ -6,15 +6,12 @@
     <div class="col-md-7">
 
         <!-- Status Banner -->
-        <div class="p-3 rounded mb-4 text-center fw-bold"
-             style="{% if booking.status == 'approved' %}background:#d1edff; color:#0c5460;
-                    {% elif booking.status == 'pending' %}background:#fff3cd; color:#856404;
-                    {% elif booking.status == 'rejected' %}background:#f8d7da; color:#721c24;
-                    {% else %}background:#e2e3e5; color:#383d41;{% endif %}">
-            <i class="fas {% if booking.status == 'approved' %}fa-check-circle
-                          {% elif booking.status == 'pending' %}fa-clock
-                          {% elif booking.status == 'rejected' %}fa-times-circle
-                          {% else %}fa-ban{% endif %} me-2"></i>
+        <div class="p-3 rounded mb-4 text-center fw-bold
+                    {% if booking.status == 'approved' %}badge-approved
+                    {% elif booking.status == 'pending' %}badge-pending
+                    {% elif booking.status == 'rejected' %}badge-rejected
+                    {% else %}badge-cancelled{% endif %}">
+            <i class="fas {% if booking.status == 'approved' %}fa-check-circle{% elif booking.status == 'pending' %}fa-clock{% elif booking.status == 'rejected' %}fa-times-circle{% else %}fa-ban{% endif %} me-2"></i>
             Booking {{ booking.get_status_display }}
         </div>
 
