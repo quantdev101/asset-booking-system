@@ -11,19 +11,19 @@
         </div>
     </div>
     <div class="col-md-3">
-        <div class="stat-card" style="border-left-color: #ffc107;">
+        <div class="stat-card" style="border-left-color:#ffc107;">
             <div class="number" style="color:#ffc107;">{{ stats.pending }}</div>
             <div class="label"><i class="fas fa-clock me-1"></i>Pending</div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="stat-card" style="border-left-color: #28a745;">
+        <div class="stat-card" style="border-left-color:#28a745;">
             <div class="number" style="color:#28a745;">{{ stats.approved }}</div>
             <div class="label"><i class="fas fa-check me-1"></i>Approved</div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="stat-card" style="border-left-color: #dc3545;">
+        <div class="stat-card" style="border-left-color:#dc3545;">
             <div class="number" style="color:#dc3545;">{{ stats.rejected }}</div>
             <div class="label"><i class="fas fa-times me-1"></i>Rejected</div>
         </div>
@@ -32,6 +32,35 @@
 
 <div class="row">
     <div class="col-md-8">
+
+        <!-- Upcoming Approved Bookings -->
+        {% if upcoming_bookings %}
+        <div class="card p-4 mb-4" style="border-left:4px solid #28a745;">
+            <h5 class="fw-bold mb-3">
+                <i class="fas fa-calendar-check me-2" style="color:#28a745;"></i>
+                Upcoming Approved Bookings
+            </h5>
+            {% for b in upcoming_bookings %}
+            <div class="d-flex align-items-center justify-content-between p-3 rounded mb-2" style="background:#f0fff4;">
+                <div class="d-flex align-items-center gap-3">
+                    <div style="width:45px;height:45px;background:#28a745;border-radius:10px;
+                                display:flex;align-items:center;justify-content:center;">
+                        <i class="fas fa-calendar-day text-white"></i>
+                    </div>
+                    <div>
+                        <div class="fw-semibold">{{ b.resource.name }}</div>
+                        <div class="text-muted small">
+                            {{ b.date }} | {{ b.start_time|time:"H:i" }} – {{ b.end_time|time:"H:i" }}
+                        </div>
+                    </div>
+                </div>
+                <a href="{% url 'booking_detail' b.pk %}" class="btn btn-sm btn-outline-success">View</a>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Recent Bookings -->
         <div class="card p-4 mb-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="fw-bold mb-0">Recent Bookings</h5>
@@ -40,7 +69,7 @@
             {% if my_bookings %}
             <div class="table-responsive">
                 <table class="table table-hover">
-                    <thead><tr><th>Resource</th><th>Date</th><th>Time</th><th>Status</th></tr></thead>
+                    <thead><tr><th>Resource</th><th>Date</th><th>Time</th><th>Status</th><th></th></tr></thead>
                     <tbody>
                         {% for b in my_bookings %}
                         <tr>
@@ -48,6 +77,9 @@
                             <td>{{ b.date }}</td>
                             <td>{{ b.start_time|time:"H:i" }} – {{ b.end_time|time:"H:i" }}</td>
                             <td><span class="badge badge-{{ b.status }}">{{ b.get_status_display }}</span></td>
+                            <td><a href="{% url 'booking_detail' b.pk %}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-eye"></i>
+                            </a></td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -61,10 +93,34 @@
             {% endif %}
         </div>
     </div>
+
     <div class="col-md-4">
+        <!-- Profile Card -->
+        <div class="card p-4 mb-4">
+            <div class="text-center mb-3">
+                {% if user.profile.profile_picture %}
+                    <img src="{{ user.profile.profile_picture.url }}"
+                         style="width:70px;height:70px;border-radius:50%;object-fit:cover;border:3px solid #1a3c6e;"
+                         alt="Profile">
+                {% else %}
+                    <div style="width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,#1a3c6e,#2d5fa3);
+                                display:flex;align-items:center;justify-content:center;margin:0 auto;border:3px solid #e8f0fe;">
+                        <span style="font-size:1.5rem;color:white;font-weight:700;">
+                            {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
+                        </span>
+                    </div>
+                {% endif %}
+                <div class="fw-bold mt-2">{{ user.get_full_name|default:user.username }}</div>
+                <div class="text-muted small">{{ user.email }}</div>
+            </div>
+            <a href="{% url 'profile' %}" class="btn btn-outline-primary btn-sm w-100">
+                <i class="fas fa-user me-1"></i>View Profile
+            </a>
+        </div>
+
+        <!-- Quick Book -->
         <div class="card p-4">
             <h5 class="fw-bold mb-3">Quick Book</h5>
-            <p class="text-muted small">Available resources you can book right now.</p>
             {% for r in resources|slice:":4" %}
             <div class="d-flex align-items-center justify-content-between mb-2 p-2 rounded" style="background:#f8f9fa;">
                 <div>
