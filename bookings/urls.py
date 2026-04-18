@@ -13,7 +13,10 @@ urlpatterns = [
     path('resources/', views.resources_list, name='resources'),
     path('resources/<int:pk>/book/', views.book_resource, name='book_resource'),
     path('my-bookings/', views.my_bookings, name='my_bookings'),
+    path('my-bookings/<int:pk>/', views.booking_detail, name='booking_detail'),
     path('my-bookings/<int:pk>/cancel/', views.cancel_booking, name='cancel_booking'),
+    path('profile/', views.profile_view, name='profile'),
+    path('profile/edit/', views.profile_edit, name='profile_edit'),
 
     # Admin
     path('admin-panel/', views.admin_dashboard, name='admin_dashboard'),
