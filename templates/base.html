@@ -106,6 +106,22 @@
         .table thead th { background: var(--primary); color: white; border: none; }
         .form-control:focus, .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 0.2rem rgba(26,60,110,0.15); }
         .card { border-radius: 12px; border: none; box-shadow: 0 2px 15px rgba(0,0,0,0.06); }
+    
+     /* Mobile responsive sidebar */
+        @media (max-width: 768px) {
+            .sidebar { width: 100%; min-height: auto; position: relative; }
+            .main-content { margin-left: 0; }
+            .sidebar .nav-link { padding: 10px 15px; }
+            .content-area { padding: 15px; }
+            .stat-card { padding: 16px; }
+            .stat-card .number { font-size: 1.5rem; }
+            .topbar { padding: 10px 15px; flex-wrap: wrap; gap: 8px; }
+            .table { font-size: 0.85rem; }
+        }
+        @media (min-width: 769px) {
+            .sidebar { position: fixed; }
+        }
+
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -118,6 +134,7 @@
     </div>
     <nav class="nav flex-column mt-3">
         {% if user.is_staff %}
+            {% if user.is_staff %}
             <a href="{% url 'admin_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
                 <i class="fas fa-tachometer-alt me-2"></i> Dashboard
             </a>
@@ -126,6 +143,9 @@
             </a>
             <a href="{% url 'admin_resources' %}" class="nav-link {% if 'resource' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="fas fa-boxes me-2"></i> Resources
+            </a>
+            <a href="{% url 'admin_students' %}" class="nav-link {% if 'student' in request.resolver_match.url_name %}active{% endif %}">
+                <i class="fas fa-users me-2"></i> Students
             </a>
             <a href="{% url 'admin_reports' %}" class="nav-link {% if 'report' in request.resolver_match.url_name %}active{% endif %}">
                 <i class="fas fa-chart-bar me-2"></i> Reports

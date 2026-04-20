@@ -27,4 +27,6 @@ urlpatterns = [
     path('admin-panel/resources/<int:pk>/edit/', views.admin_resource_edit, name='admin_resource_edit'),
     path('admin-panel/resources/<int:pk>/delete/', views.admin_resource_delete, name='admin_resource_delete'),
     path('admin-panel/reports/', views.admin_reports, name='admin_reports'),
+    path('admin-panel/reports/export/', views.admin_reports_export_csv, name='admin_reports_export'),
+    path('admin-panel/students/', views.admin_students, name='admin_students'),
 ]
