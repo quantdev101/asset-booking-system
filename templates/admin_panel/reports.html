@@ -1,30 +1,131 @@
 {% extends 'base.html' %}
 {% block title %}Reports{% endblock %}
 {% block page_title %}Usage Reports{% endblock %}
+{% block extra_css %}
+<style>
+    @media print {
+        .sidebar, .topbar, .no-print { display: none !important; }
+        .main-content { margin-left: 0 !important; }
+        .card { box-shadow: none !important; border: 1px solid #ddd !important; }
+    }
+</style>
+{% endblock %}
 {% block content %}
 
+<!-- Date Filter & Actions -->
+<div class="card p-3 mb-4 no-print">
+    <form method="get" class="d-flex gap-2 flex-wrap align-items-end">
+        <div>
+            <label class="form-label fw-semibold small mb-1">From Date</label>
+            <input type="date" name="date_from" class="form-control" value="{{ date_from }}">
+        </div>
+        <div>
+            <label class="form-label fw-semibold small mb-1">To Date</label>
+            <input type="date" name="date_to" class="form-control" value="{{ date_to }}">
+        </div>
+        <div class="d-flex gap-2 align-items-end">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-filter me-1"></i>Apply Filter
+            </button>
+            {% if date_from or date_to %}
+            <a href="{% url 'admin_reports' %}" class="btn btn-outline-secondary">Clear</a>
+            {% endif %}
+        </div>
+        <div class="ms-auto d-flex gap-2 align-items-end">
+            <a href="{% url 'admin_reports_export' %}?date_from={{ date_from }}&date_to={{ date_to }}"
+               class="btn btn-success">
+                <i class="fas fa-file-csv me-1"></i>Export CSV
+            </a>
+            <button type="button" class="btn btn-outline-secondary" onclick="window.print()">
+                <i class="fas fa-print me-1"></i>Print
+            </button>
+        </div>
+    </form>
+</div>
+
+{% if date_from or date_to %}
+<div class="alert alert-info no-print">
+    <i class="fas fa-filter me-2"></i>
+    Showing data
+    {% if date_from %}from <strong>{{ date_from }}</strong>{% endif %}
+    {% if date_to %}to <strong>{{ date_to }}</strong>{% endif %}
+</div>
+{% endif %}
+
+<!-- Summary Stats -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-2">
+        <div class="stat-card text-center" style="border-left-color:#1a3c6e; padding:16px;">
+            <div class="number" style="font-size:1.5rem;">{{ total_stats.total }}</div>
+            <div class="label">Total</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-2">
+        <div class="stat-card text-center" style="border-left-color:#28a745; padding:16px;">
+            <div class="number" style="font-size:1.5rem; color:#28a745;">{{ total_stats.approved }}</div>
+            <div class="label">Approved</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-2">
+        <div class="stat-card text-center" style="border-left-color:#ffc107; padding:16px;">
+            <div class="number" style="font-size:1.5rem; color:#ffc107;">{{ total_stats.pending }}</div>
+            <div class="label">Pending</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-2">
+        <div class="stat-card text-center" style="border-left-color:#dc3545; padding:16px;">
+            <div class="number" style="font-size:1.5rem; color:#dc3545;">{{ total_stats.rejected }}</div>
+            <div class="label">Rejected</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-2">
+        <div class="stat-card text-center" style="border-left-color:#6c757d; padding:16px;">
+            <div class="number" style="font-size:1.5rem; color:#6c757d;">{{ total_stats.cancelled }}</div>
+            <div class="label">Cancelled</div>
+        </div>
+    </div>
+</div>
+
+<!-- Resource Usage Table -->
 <div class="card p-4 mb-4">
-    <h5 class="fw-bold mb-4">Resource Usage Summary</h5>
+    <h5 class="fw-bold mb-4">
+        <i class="fas fa-boxes me-2" style="color:#1a3c6e;"></i>Resource Usage Summary
+    </h5>
     <div class="table-responsive">
         <table class="table table-hover">
             <thead>
-                <tr><th>Resource</th><th>Type</th><th>Location</th><th>Total Bookings</th><th>Approved</th></tr>
+                <tr>
+                    <th>Resource</th>
+                    <th>Type</th>
+                    <th>Location</th>
+                    <th>Total</th>
+                    <th>Approved</th>
+                    <th>Pending</th>
+                    <th>Rejected</th>
+                    <th>Usage Bar</th>
+                </tr>
             </thead>
             <tbody>
                 {% for r in resource_usage %}
                 <tr>
                     <td><strong>{{ r.name }}</strong></td>
-                    <td>{{ r.get_resource_type_display }}</td>
-                    <td>{{ r.location }}</td>
                     <td>
-                        <div class="d-flex align-items-center gap-2">
-                            {{ r.total_bookings }}
-                            <div class="progress flex-grow-1" style="height:6px;">
-                                <div class="progress-bar" style="width:{{ r.total_bookings }}0%; background:#1a3c6e;"></div>
+                        <span class="badge" style="background:#e8f0fe; color:#1a3c6e;">
+                            {{ r.get_resource_type_display }}
+                        </span>
+                    </td>
+                    <td>{{ r.location }}</td>
+                    <td><strong>{{ r.total_bookings }}</strong></td>
+                    <td><span class="badge bg-success">{{ r.approved_bookings }}</span></td>
+                    <td><span class="badge bg-warning text-dark">{{ r.pending_bookings }}</span></td>
+                    <td><span class="badge bg-danger">{{ r.rejected_bookings }}</span></td>
+                    <td style="width:120px;">
+                        <div class="progress" style="height:8px;">
+                            <div class="progress-bar" role="progressbar"
+                                 style="width:{{ r.total_bookings }}0%; background:#1a3c6e; max-width:100%;">
                             </div>
                         </div>
                     </td>
-                    <td><span class="badge bg-success">{{ r.approved_bookings }}</span></td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -32,20 +133,43 @@
     </div>
 </div>
 
+<!-- Monthly Bookings Table -->
 <div class="card p-4">
-    <h5 class="fw-bold mb-4">Bookings by Month</h5>
+    <h5 class="fw-bold mb-4">
+        <i class="fas fa-calendar-alt me-2" style="color:#1a3c6e;"></i>Bookings by Month
+    </h5>
     <div class="table-responsive">
-        <table class="table">
-            <thead><tr><th>Year</th><th>Month</th><th>Total Bookings</th></tr></thead>
+        <table class="table table-hover">
+            <thead>
+                <tr><th>Year</th><th>Month</th><th>Total Bookings</th><th>Volume</th></tr>
+            </thead>
             <tbody>
                 {% for m in monthly_bookings %}
                 <tr>
                     <td>{{ m.date__year }}</td>
-                    <td>{{ m.date__month }}</td>
-                    <td>{{ m.count }}</td>
+                    <td>
+                        {% if m.date__month == 1 %}January
+                        {% elif m.date__month == 2 %}February
+                        {% elif m.date__month == 3 %}March
+                        {% elif m.date__month == 4 %}April
+                        {% elif m.date__month == 5 %}May
+                        {% elif m.date__month == 6 %}June
+                        {% elif m.date__month == 7 %}July
+                        {% elif m.date__month == 8 %}August
+                        {% elif m.date__month == 9 %}September
+                        {% elif m.date__month == 10 %}October
+                        {% elif m.date__month == 11 %}November
+                        {% else %}December{% endif %}
+                    </td>
+                    <td><strong>{{ m.count }}</strong></td>
+                    <td style="width:200px;">
+                        <div class="progress" style="height:8px;">
+                            <div class="progress-bar" style="width:{{ m.count }}0%; background:#f0a500; max-width:100%;"></div>
+                        </div>
+                    </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="3" class="text-center text-muted">No data yet.</td></tr>
+                <tr><td colspan="4" class="text-center text-muted py-3">No data for selected period.</td></tr>
                 {% endfor %}
             </tbody>
         </table>
