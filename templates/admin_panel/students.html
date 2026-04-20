@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% block title %}Students{% endblock %}
+{% block page_title %}Student List{% endblock %}
+{% block content %}
+
+<!-- Search -->
+<div class="card p-3 mb-4">
+    <form method="get" class="d-flex gap-2">
+        <div class="flex-grow-1">
+            <div class="input-group">
+                <span class="input-group-text" style="background:#1a3c6e; color:white;">
+                    <i class="fas fa-search"></i>
+                </span>
+                <input type="text" name="search" class="form-control"
+                       placeholder="Search by name, username or email..." value="{{ search }}">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Search</button>
+        {% if search %}
+        <a href="{% url 'admin_students' %}" class="btn btn-outline-secondary">Clear</a>
+        {% endif %}
+    </form>
+</div>
+
+<div class="card p-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <span class="text-muted small">
+            Showing {{ page_obj.start_index }}–{{ page_obj.end_index }} of {{ page_obj.paginator.count }} students
+        </span>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Student</th>
+                    <th>Student ID</th>
+                    <th>Faculty</th>
+                    <th>Email</th>
+                    <th>Total Bookings</th>
+                    <th>Approved</th>
+                    <th>Joined</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <div style="width:38px; height:38px; border-radius:50%;
+                                        background:linear-gradient(135deg,#1a3c6e,#2d5fa3);
+                                        display:flex; align-items:center; justify-content:center;
+                                        flex-shrink:0;">
+                                <span style="color:white; font-weight:700; font-size:0.85rem;">
+                                    {{ student.first_name|first|upper }}{{ student.last_name|first|upper }}
+                                </span>
+                            </div>
+                            <div>
+                                <div class="fw-semibold">{{ student.get_full_name|default:student.username }}</div>
+                                <div class="text-muted" style="font-size:0.75rem;">@{{ student.username }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        {% if student.profile %}
+                            <span class="badge" style="background:#e8f0fe; color:#1a3c6e;">
+                                {{ student.profile.student_id }}
+                            </span>
+                        {% else %}
+                            <span class="text-muted">—</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if student.profile %}
+                            {{ student.profile.faculty|truncatechars:25 }}
+                        {% else %}—{% endif %}
+                    </td>
+                    <td>{{ student.email|default:"—" }}</td>
+                    <td>
+                        <span class="fw-bold" style="color:#1a3c6e;">{{ student.total_bookings }}</span>
+                    </td>
+                    <td>
+                        <span class="badge bg-success">{{ student.approved_bookings }}</span>
+                    </td>
+                    <td>
+                        <span class="text-muted small">{{ student.date_joined|date:"M d, Y" }}</span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="text-center text-muted py-4">No students found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <nav class="mt-3">
+        <ul class="pagination justify-content-center mb-0">
+            {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}&search={{ search }}">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>
+            {% endif %}
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                <li class="page-item active">
+                    <span class="page-link" style="background:#1a3c6e; border-color:#1a3c6e;">{{ num }}</span>
+                </li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}&search={{ search }}">{{ num }}</a>
+                </li>
+                {% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}&search={{ search }}">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}
