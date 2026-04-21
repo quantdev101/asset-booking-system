@@ -18,7 +18,7 @@ A web application that allows students to book university resources
 ## 🚀 How to Run Locally
 
 ### 1. Clone the repository
-git clone https://github.com/YOURUSERNAME/asset-booking-system.git
+git clone https://github.com/quantdev101/asset-booking-system.git
 cd asset-booking-system
 
 ### 2. Create virtual environment
