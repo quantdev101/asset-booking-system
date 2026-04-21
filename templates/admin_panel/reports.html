@@ -132,42 +132,6 @@
 
 <div class="card p-4 mb-4">
     <h5 class="fw-bold mb-4">
-        <i class="fas fa-calendar-alt me-2" style="color:#1a3c6e;"></i>Bookings by Month
-    </h5>
-    <div class="table-responsive">
-        <table class="table table-hover">
-            <thead>
-                <tr><th>Year</th><th>Month</th><th>Total Bookings</th><th>Volume</th></tr>
-            </thead>
-            <tbody>
-                {% for m in monthly_bookings %}
-                <tr>
-                    <td>{{ m.date__year }}</td>
-                    <td>
-                        {% if m.date__month == 1 %}January{% elif m.date__month == 2 %}February
-                        {% elif m.date__month == 3 %}March{% elif m.date__month == 4 %}April
-                        {% elif m.date__month == 5 %}May{% elif m.date__month == 6 %}June
-                        {% elif m.date__month == 7 %}July{% elif m.date__month == 8 %}August
-                        {% elif m.date__month == 9 %}September{% elif m.date__month == 10 %}October
-                        {% elif m.date__month == 11 %}November{% else %}December{% endif %}
-                    </td>
-                    <td><strong>{{ m.count }}</strong></td>
-                    <td style="width:200px;">
-                        <div class="progress" style="height:8px;">
-                            <div class="progress-bar" style="width:{{ m.count }}0%; background:#f0a500; max-width:100%;"></div>
-                        </div>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr><td colspan="4" class="text-center text-muted py-3">No data for selected period.</td></tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<div class="card p-4">
-    <h5 class="fw-bold mb-4">
         <i class="fas fa-list me-2" style="color:#1a3c6e;"></i>Detailed Booking Records
     </h5>
     <div class="table-responsive">
@@ -202,4 +166,39 @@
     </div>
 </div>
 
+<div class="card p-4">
+    <h5 class="fw-bold mb-4">
+        <i class="fas fa-calendar-alt me-2" style="color:#1a3c6e;"></i>Bookings by Month
+    </h5>
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr><th>Year</th><th>Month</th><th>Total Bookings</th><th>Volume</th></tr>
+            </thead>
+            <tbody>
+                {% for m in monthly_bookings %}
+                <tr>
+                    <td>{{ m.date__year }}</td>
+                    <td>
+                        {% if m.date__month == 1 %}January{% elif m.date__month == 2 %}February
+                        {% elif m.date__month == 3 %}March{% elif m.date__month == 4 %}April
+                        {% elif m.date__month == 5 %}May{% elif m.date__month == 6 %}June
+                        {% elif m.date__month == 7 %}July{% elif m.date__month == 8 %}August
+                        {% elif m.date__month == 9 %}September{% elif m.date__month == 10 %}October
+                        {% elif m.date__month == 11 %}November{% else %}December{% endif %}
+                    </td>
+                    <td><strong>{{ m.count }}</strong></td>
+                    <td style="width:200px;">
+                        <div class="progress" style="height:8px;">
+                            <div class="progress-bar" style="width:{{ m.count }}0%; background:#f0a500; max-width:100%;"></div>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="text-center text-muted py-3">No data for selected period.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock %}
