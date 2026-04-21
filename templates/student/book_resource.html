@@ -8,36 +8,39 @@
         {% if form.errors %}
         <div class="alert alert-danger">
             <strong>Please fix the errors below:</strong>
-            {{ form.errors }}
-        </div>
-        {% endif %}
-
-        {% if form.non_field_errors %}
-        <div class="alert alert-danger">
-            {{ form.non_field_errors }}
+            {% for field, errors in form.errors.items %}
+                {% for error in errors %}
+                    <div>{{ error }}</div>
+                {% endfor %}
+            {% endfor %}
         </div>
         {% endif %}
 
         <div class="card p-4">
             <div class="d-flex align-items-center mb-4">
-                <div style="width:50px;height:50px;background:#1a3c6e;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-right:15px;">
+                <div style="width:50px;height:50px;background:#1a3c6e;border-radius:10px;
+                            display:flex;align-items:center;justify-content:center;margin-right:15px;">
                     <i class="fas fa-calendar-plus text-white"></i>
                 </div>
                 <div>
                     <h5 class="fw-bold mb-0">{{ resource.name }}</h5>
-                    <small class="text-muted"><i class="fas fa-map-marker-alt me-1"></i>{{ resource.location }}</small>
+                    <small class="text-muted">
+                        <i class="fas fa-map-marker-alt me-1"></i>{{ resource.location }}
+                        &nbsp;|&nbsp;
+                        <i class="fas fa-users me-1"></i>Capacity: {{ resource.capacity }}
+                    </small>
                 </div>
             </div>
 
-            <form method="POST" action="">
+            <form method="POST" action="" id="bookingForm">
                 {% csrf_token %}
-
                 <input type="hidden" name="resource" value="{{ resource.pk }}">
 
                 <div class="mb-3">
-                    <label class="form-label fw-semibold">Date</label>
-                    <input type="date" name="date" class="form-control"
-                           value="{{ form.date.value|default:'' }}" required>
+                    <label class="form-label fw-semibold">Date <span class="text-danger">*</span></label>
+                    <input type="date" name="date" id="id_date" class="form-control"
+                           value="{{ form.date.value|default:'' }}"
+                           min="{{ today }}" required>
                     {% if form.date.errors %}
                         <div class="text-danger small mt-1">{{ form.date.errors }}</div>
                     {% endif %}
@@ -45,33 +48,47 @@
 
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label class="form-label fw-semibold">Start Time</label>
-                        <input type="time" name="start_time" class="form-control"
+                        <label class="form-label fw-semibold">Start Time <span class="text-danger">*</span></label>
+                        <input type="time" name="start_time" id="id_start_time" class="form-control"
                                value="{{ form.start_time.value|default:'' }}" required>
                         {% if form.start_time.errors %}
                             <div class="text-danger small mt-1">{{ form.start_time.errors }}</div>
                         {% endif %}
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label class="form-label fw-semibold">End Time</label>
-                        <input type="time" name="end_time" class="form-control"
+                        <label class="form-label fw-semibold">End Time <span class="text-danger">*</span></label>
+                        <input type="time" name="end_time" id="id_end_time" class="form-control"
                                value="{{ form.end_time.value|default:'' }}" required>
                         {% if form.end_time.errors %}
                             <div class="text-danger small mt-1">{{ form.end_time.errors }}</div>
                         {% endif %}
+                        <div id="timeError" class="text-danger small mt-1" style="display:none;">
+                            End time must be after start time.
+                        </div>
                     </div>
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label fw-semibold">Purpose</label>
-                    <textarea name="purpose" class="form-control" rows="3" required>{{ form.purpose.value|default:'' }}</textarea>
+                    <label class="form-label fw-semibold">Purpose <span class="text-danger">*</span></label>
+                    <textarea name="purpose" class="form-control" rows="3"
+                              placeholder="Describe the purpose of your booking..." required>{{ form.purpose.value|default:'' }}</textarea>
                     {% if form.purpose.errors %}
                         <div class="text-danger small mt-1">{{ form.purpose.errors }}</div>
                     {% endif %}
                 </div>
 
+                <!-- Summary box — shows before submitting -->
+                <div id="bookingSummary" class="alert alert-info mb-3" style="display:none;">
+                    <strong><i class="fas fa-info-circle me-1"></i>Booking Summary</strong>
+                    <div class="mt-1 small">
+                        <span id="summaryResource">{{ resource.name }}</span> &nbsp;|&nbsp;
+                        <span id="summaryDate"></span> &nbsp;|&nbsp;
+                        <span id="summaryTime"></span>
+                    </div>
+                </div>
+
                 <div class="d-flex gap-2 mt-3">
-                    <button type="submit" class="btn btn-primary flex-grow-1">
+                    <button type="submit" class="btn btn-primary flex-grow-1" id="submitBtn">
                         <i class="fas fa-check me-2"></i>Submit Booking Request
                     </button>
                     <a href="{% url 'resources' %}" class="btn btn-outline-secondary">Cancel</a>
@@ -80,4 +97,77 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const startInput = document.getElementById('id_start_time');
+    const endInput = document.getElementById('id_end_time');
+    const dateInput = document.getElementById('id_date');
+    const timeError = document.getElementById('timeError');
+    const submitBtn = document.getElementById('submitBtn');
+    const summary = document.getElementById('bookingSummary');
+
+    // Set minimum date to today
+    const today = new Date().toISOString().split('T')[0];
+    dateInput.setAttribute('min', today);
+
+    function validateTimes() {
+        const start = startInput.value;
+        const end = endInput.value;
+        if (start && end) {
+            if (end <= start) {
+                timeError.style.display = 'block';
+                endInput.classList.add('is-invalid');
+                submitBtn.disabled = true;
+                return false;
+            } else {
+                timeError.style.display = 'none';
+                endInput.classList.remove('is-invalid');
+                submitBtn.disabled = false;
+                return true;
+            }
+        }
+        return true;
+    }
+
+    function updateSummary() {
+        const date = dateInput.value;
+        const start = startInput.value;
+        const end = endInput.value;
+        if (date && start && end && validateTimes()) {
+            document.getElementById('summaryDate').textContent = date;
+            document.getElementById('summaryTime').textContent = start + ' – ' + end;
+            summary.style.display = 'block';
+        } else {
+            summary.style.display = 'none';
+        }
+    }
+
+    startInput.addEventListener('change', function() {
+        // Auto-set end time to 1 hour after start if end is empty or invalid
+        if (this.value && (!endInput.value || endInput.value <= this.value)) {
+            const [h, m] = this.value.split(':').map(Number);
+            const newH = (h + 1) % 24;
+            endInput.value = String(newH).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+        }
+        validateTimes();
+        updateSummary();
+    });
+
+    endInput.addEventListener('change', function() {
+        validateTimes();
+        updateSummary();
+    });
+
+    dateInput.addEventListener('change', updateSummary);
+
+    // Block form submit if times invalid
+    document.getElementById('bookingForm').addEventListener('submit', function(e) {
+        if (!validateTimes()) {
+            e.preventDefault();
+            endInput.focus();
+        }
+    });
+</script>
 {% endblock %}
