@@ -119,8 +119,12 @@ def book_resource(request, pk):
             print("Form errors:", form.errors)
     else:
         form = BookingForm()
-    return render(request, 'student/book_resource.html', {'form': form, 'resource': resource})
-
+    today = date.today().strftime('%Y-%m-%d')
+    return render(request, 'student/book_resource.html', {
+        'form': form,
+        'resource': resource,
+        'today': today,
+    })
 
 @login_required
 def my_bookings(request):

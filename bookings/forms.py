@@ -113,17 +113,23 @@ class BookingForm(forms.ModelForm):
             'date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'start_time': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
             'end_time': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
-            'purpose': forms.Textarea(attrs={'rows': 3, 'class': 'form-control', 'placeholder': 'Describe the purpose of your booking...'}),
+            'purpose': forms.Textarea(attrs={'rows': 3, 'class': 'form-control',
+                                             'placeholder': 'Describe the purpose of your booking...'}),
         }
 
     def clean(self):
         cleaned_data = super().clean()
         start_time = cleaned_data.get('start_time')
         end_time = cleaned_data.get('end_time')
+        booking_date = cleaned_data.get('date')
+
         if start_time and end_time and start_time >= end_time:
             raise forms.ValidationError("End time must be after start time.")
-        return cleaned_data
 
+        if booking_date and booking_date < date.today():
+            raise forms.ValidationError("Booking date cannot be in the past.")
+
+        return cleaned_data
 
 class ResourceForm(forms.ModelForm):
     class Meta:
