@@ -51,19 +51,28 @@
 
 <div class="row g-4">
     {% for resource in resources %}
-    <div class="col-md-4">
-        <div class="resource-card h-100">
+    <div class="col-md-4 col-sm-6">
+        <div class="card h-100" style="border-radius:12px; overflow:hidden; box-shadow:0 2px 15px rgba(0,0,0,0.06); transition:transform 0.2s, box-shadow 0.2s;"
+             onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 8px 25px rgba(0,0,0,0.12)'"
+             onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 2px 15px rgba(0,0,0,0.06)'">
+
             {% if resource.image %}
-                <img src="{{ resource.image.url }}" class="card-img-top" alt="{{ resource.name }}"
-                     style="height:200px; object-fit:cover;">
+                <img src="{{ resource.image.url }}" alt="{{ resource.name }}"
+                     style="width:100%; height:200px; object-fit:cover;">
             {% else %}
-                <div class="card-img-placeholder" style="height:200px;">
-                    {% if resource.resource_type == 'lab' %}<i class="fas fa-desktop fa-3x" style="color:rgba(255,255,255,0.6);"></i>
-                    {% elif resource.resource_type == 'equipment' %}<i class="fas fa-tools fa-3x" style="color:rgba(255,255,255,0.6);"></i>
-                    {% else %}<i class="fas fa-door-open fa-3x" style="color:rgba(255,255,255,0.6);"></i>{% endif %}
+                <div style="height:200px; background:linear-gradient(135deg,#1a3c6e,#2d5fa3);
+                            display:flex; align-items:center; justify-content:center;">
+                    {% if resource.resource_type == 'lab' %}
+                        <i class="fas fa-desktop fa-3x" style="color:rgba(255,255,255,0.6);"></i>
+                    {% elif resource.resource_type == 'equipment' %}
+                        <i class="fas fa-tools fa-3x" style="color:rgba(255,255,255,0.6);"></i>
+                    {% else %}
+                        <i class="fas fa-door-open fa-3x" style="color:rgba(255,255,255,0.6);"></i>
+                    {% endif %}
                 </div>
             {% endif %}
-            <div class="p-3 d-flex flex-column h-100">
+
+            <div class="card-body d-flex flex-column p-3">
                 <div class="mb-2">
                     <span class="badge" style="background:#e8f0fe; color:#1a3c6e; font-size:0.75rem;">
                         {{ resource.get_resource_type_display }}
@@ -73,16 +82,19 @@
                 <p class="text-muted small mb-1">
                     <i class="fas fa-map-marker-alt me-1"></i>{{ resource.location }}
                 </p>
-                <p class="text-muted small mb-2">
+                <p class="text-muted small mb-1">
                     <i class="fas fa-users me-1"></i>Capacity: {{ resource.capacity }}
                 </p>
-                <p class="small text-muted mb-2 flex-grow-1">{{ resource.description|truncatechars:90 }}</p>
-                <div class="d-flex align-items-center gap-2 mb-3">
+                <p class="small text-muted mb-2" style="flex-grow:1;">
+                    {{ resource.description|truncatechars:90 }}
+                </p>
+                <div class="mb-2">
                     <span class="badge" style="background:#e8f0fe; color:#1a3c6e; font-size:0.75rem;">
                         <i class="fas fa-calendar-check me-1"></i>{{ resource.booking_count }} bookings
                     </span>
                 </div>
-                <a href="{% url 'book_resource' resource.pk %}" class="btn btn-primary btn-sm w-100">
+                <a href="{% url 'book_resource' resource.pk %}"
+                   class="btn btn-primary btn-sm w-100 mt-auto">
                     <i class="fas fa-calendar-plus me-1"></i>Book Now
                 </a>
             </div>
