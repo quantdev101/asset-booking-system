@@ -43,15 +43,21 @@ Visit: http://127.0.0.1:8000
 ## 📋 Features
 
 ### Student
-- Register and login
-- Browse resources by type (Lab, Equipment, Meeting Room)
-- Submit booking requests
-- View and cancel own bookings
+- Register and login with student profile
+- Browse and search resources by type (Lab, Equipment, Meeting Room)
+- Submit booking requests with time conflict prevention
+- View booking details and status updates
+- Cancel pending bookings
+- Edit personal profile with photo
 
 ### Admin
 - Approve or reject booking requests with notes
-- Add, edit, delete resources
-- View usage reports
+- Add, edit, delete resources with images
+- View student list with booking history
+- Usage reports with date filtering
+- Export reports to CSV
+- Print reports
+- Dashboard with charts
 
 ## 📁 Project Structure
 asset_booking/
