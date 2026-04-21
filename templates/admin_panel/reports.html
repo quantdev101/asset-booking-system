@@ -12,7 +12,6 @@
 {% endblock %}
 {% block content %}
 
-<!-- Date Filter & Actions -->
 <div class="card p-3 mb-4 no-print">
     <form method="get" class="d-flex gap-2 flex-wrap align-items-end">
         <div>
@@ -52,7 +51,6 @@
 </div>
 {% endif %}
 
-<!-- Summary Stats -->
 <div class="row g-3 mb-4">
     <div class="col-6 col-md-2">
         <div class="stat-card text-center" style="border-left-color:#1a3c6e; padding:16px;">
@@ -86,7 +84,6 @@
     </div>
 </div>
 
-<!-- Resource Usage Table -->
 <div class="card p-4 mb-4">
     <h5 class="fw-bold mb-4">
         <i class="fas fa-boxes me-2" style="color:#1a3c6e;"></i>Resource Usage Summary
@@ -133,8 +130,7 @@
     </div>
 </div>
 
-<!-- Monthly Bookings Table -->
-<div class="card p-4">
+<div class="card p-4 mb-4">
     <h5 class="fw-bold mb-4">
         <i class="fas fa-calendar-alt me-2" style="color:#1a3c6e;"></i>Bookings by Month
     </h5>
@@ -148,18 +144,12 @@
                 <tr>
                     <td>{{ m.date__year }}</td>
                     <td>
-                        {% if m.date__month == 1 %}January
-                        {% elif m.date__month == 2 %}February
-                        {% elif m.date__month == 3 %}March
-                        {% elif m.date__month == 4 %}April
-                        {% elif m.date__month == 5 %}May
-                        {% elif m.date__month == 6 %}June
-                        {% elif m.date__month == 7 %}July
-                        {% elif m.date__month == 8 %}August
-                        {% elif m.date__month == 9 %}September
-                        {% elif m.date__month == 10 %}October
-                        {% elif m.date__month == 11 %}November
-                        {% else %}December{% endif %}
+                        {% if m.date__month == 1 %}January{% elif m.date__month == 2 %}February
+                        {% elif m.date__month == 3 %}March{% elif m.date__month == 4 %}April
+                        {% elif m.date__month == 5 %}May{% elif m.date__month == 6 %}June
+                        {% elif m.date__month == 7 %}July{% elif m.date__month == 8 %}August
+                        {% elif m.date__month == 9 %}September{% elif m.date__month == 10 %}October
+                        {% elif m.date__month == 11 %}November{% else %}December{% endif %}
                     </td>
                     <td><strong>{{ m.count }}</strong></td>
                     <td style="width:200px;">
@@ -175,4 +165,41 @@
         </table>
     </div>
 </div>
+
+<div class="card p-4">
+    <h5 class="fw-bold mb-4">
+        <i class="fas fa-list me-2" style="color:#1a3c6e;"></i>Detailed Booking Records
+    </h5>
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Resource</th>
+                    <th>Type</th>
+                    <th>Location</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for b in bookings %}
+                <tr>
+                    <td>{{ b.user.get_full_name|default:b.user.username }}</td>
+                    <td><strong>{{ b.resource.name }}</strong></td>
+                    <td>{{ b.resource.get_resource_type_display }}</td>
+                    <td>{{ b.resource.location }}</td>
+                    <td>{{ b.date }}</td>
+                    <td>{{ b.start_time|time:"H:i" }} – {{ b.end_time|time:"H:i" }}</td>
+                    <td><span class="badge badge-{{ b.status }}">{{ b.get_status_display }}</span></td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" class="text-center text-muted py-3">No bookings found for this period.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
 {% endblock %}
