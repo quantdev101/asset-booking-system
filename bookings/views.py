@@ -331,18 +331,20 @@ def admin_reports(request):
     date_from = request.GET.get('date_from', '')
     date_to = request.GET.get('date_to', '')
 
-    resource_usage = Resource.objects.annotate(
-        total_bookings=Count('bookings'),
-        approved_bookings=Count('bookings', filter=Q(bookings__status='approved')),
-        pending_bookings=Count('bookings', filter=Q(bookings__status='pending')),
-        rejected_bookings=Count('bookings', filter=Q(bookings__status='rejected')),
-    )
-
+    # Query all bookings and apply date filters
     bookings_qs = Booking.objects.all()
     if date_from:
         bookings_qs = bookings_qs.filter(date__gte=date_from)
     if date_to:
         bookings_qs = bookings_qs.filter(date__lte=date_to)
+
+    # Calculate Resource Usage Summary
+    resource_usage = Resource.objects.annotate(
+        total_bookings=Count('bookings', filter=Q(bookings__in=bookings_qs)),
+        approved_bookings=Count('bookings', filter=Q(bookings__in=bookings_qs, bookings__status='approved')),
+        pending_bookings=Count('bookings', filter=Q(bookings__in=bookings_qs, bookings__status='pending')),
+        rejected_bookings=Count('bookings', filter=Q(bookings__in=bookings_qs, bookings__status='rejected')),
+    )
 
     monthly_bookings = bookings_qs.values('date__month', 'date__year').annotate(
         count=Count('id')
@@ -362,8 +364,8 @@ def admin_reports(request):
         'total_stats': total_stats,
         'date_from': date_from,
         'date_to': date_to,
+        'bookings': bookings_qs, # Pass the filtered bookings list
     })
-
 
 @login_required
 @user_passes_test(is_admin)
