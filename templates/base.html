@@ -107,7 +107,56 @@
         .table thead th { background: var(--primary); color: white; border: none; }
         .form-control:focus, .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 0.2rem rgba(26,60,110,0.15); }
         .card { border-radius: 12px; border: none; box-shadow: 0 2px 15px rgba(0,0,0,0.06); }
-    
+
+        /* Profile dropdown in topbar */
+        .profile-dropdown { position: relative; }
+        .profile-dropdown .profile-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            border-radius: 8px;
+            transition: background 0.2s;
+            color: #555;
+            font-size: 0.9rem;
+        }
+        .profile-dropdown .profile-btn:hover { background: #f4f6fb; }
+        .profile-dropdown .dropdown-menu-custom {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: calc(100% + 8px);
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+            min-width: 180px;
+            z-index: 999;
+            overflow: hidden;
+        }
+        .profile-dropdown .dropdown-menu-custom.show { display: block; }
+        .profile-dropdown .dropdown-menu-custom a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 11px 16px;
+            color: #333;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: background 0.15s;
+        }
+        .profile-dropdown .dropdown-menu-custom a:hover { background: #f4f6fb; }
+        .profile-dropdown .dropdown-menu-custom .divider {
+            border-top: 1px solid #eee;
+            margin: 4px 0;
+        }
+        .profile-dropdown .dropdown-menu-custom a.logout-link {
+            color: #dc3545;
+        }
+        .profile-dropdown .dropdown-menu-custom a.logout-link:hover { background: #fff5f5; }
+
        /* Mobile responsive sidebar */
         @media (max-width: 768px) {
             .sidebar { width: 100%; min-height: auto; position: relative; }
@@ -164,10 +213,6 @@
                 <i class="fas fa-user me-2"></i> My Profile
             </a>
         {% endif %}
-        <hr style="border-color: rgba(255,255,255,0.1); margin: 10px 20px;">
-        <a href="{% url 'logout' %}" class="nav-link text-danger">
-            <i class="fas fa-sign-out-alt me-2"></i> Logout
-        </a>
     </nav>
 </div>
 
@@ -175,11 +220,31 @@
     <div class="topbar">
         <span class="page-title">{% block page_title %}Dashboard{% endblock %}</span>
         <div class="d-flex align-items-center gap-3">
-            <span class="text-muted small">
-                <i class="fas fa-user-circle me-1"></i>
-                {{ user.get_full_name|default:user.username }}
-                {% if user.is_staff %}<span class="badge bg-warning text-dark ms-1">Admin</span>{% endif %}
-            </span>
+
+            <!-- Profile dropdown -->
+            <div class="profile-dropdown">
+                <button class="profile-btn" onclick="toggleProfileMenu(event)">
+                    <i class="fas fa-user-circle" style="color: var(--primary); font-size:1.2rem;"></i>
+                    <span>{{ user.get_full_name|default:user.username }}</span>
+                    {% if user.is_staff %}<span class="badge bg-warning text-dark">Admin</span>{% endif %}
+                    <i class="fas fa-chevron-down" style="font-size:0.7rem; color:#aaa;"></i>
+                </button>
+                <div class="dropdown-menu-custom" id="profileDropdown">
+                    {% if not user.is_staff %}
+                    <a href="{% url 'profile' %}">
+                        <i class="fas fa-user" style="color: var(--primary);"></i> View Profile
+                    </a>
+                    <a href="{% url 'profile_edit' %}">
+                        <i class="fas fa-edit" style="color: var(--primary);"></i> Edit Profile
+                    </a>
+                    {% endif %}
+                    <div class="divider"></div>
+                    <a href="{% url 'logout' %}" class="logout-link">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </div>
+            </div>
+
         </div>
     </div>
     <div class="content-area">
@@ -204,6 +269,16 @@
 </footer>
 {% endif %}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function toggleProfileMenu(e) {
+        e.stopPropagation();
+        document.getElementById('profileDropdown').classList.toggle('show');
+    }
+    // Close dropdown when clicking anywhere else
+    document.addEventListener('click', function() {
+        document.getElementById('profileDropdown')?.classList.remove('show');
+    });
+</script>
 {% block extra_js %}{% endblock %}
 </body>
 </html>
