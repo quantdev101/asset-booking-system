@@ -95,29 +95,6 @@
     </div>
 
     <div class="col-md-4">
-        <!-- Profile Card -->
-        <div class="card p-4 mb-4">
-            <div class="text-center mb-3">
-                {% if user.profile.profile_picture %}
-                    <img src="{{ user.profile.profile_picture.url }}"
-                         style="width:70px;height:70px;border-radius:50%;object-fit:cover;border:3px solid #1a3c6e;"
-                         alt="Profile">
-                {% else %}
-                    <div style="width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,#1a3c6e,#2d5fa3);
-                                display:flex;align-items:center;justify-content:center;margin:0 auto;border:3px solid #e8f0fe;">
-                        <span style="font-size:1.5rem;color:white;font-weight:700;">
-                            {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
-                        </span>
-                    </div>
-                {% endif %}
-                <div class="fw-bold mt-2">{{ user.get_full_name|default:user.username }}</div>
-                <div class="text-muted small">{{ user.email }}</div>
-            </div>
-            <a href="{% url 'profile' %}" class="btn btn-outline-primary btn-sm w-100">
-                <i class="fas fa-user me-1"></i>View Profile
-            </a>
-        </div>
-
         <!-- Quick Book -->
         <div class="card p-4">
             <h5 class="fw-bold mb-3">Quick Book</h5>
