@@ -55,20 +55,15 @@
                     </td>
                     <td>
                         <span class="fw-bold" style="color:#1a3c6e;">{{ r.booking_count }}</span>
-                        <div class="progress mt-1" style="height:4px; width:60px;">
-                            <div class="progress-bar" style="width:{{ r.booking_count }}0%; background:#1a3c6e;"></div>
-                        </div>
                     </td>
                     <td><span class="badge bg-success">{{ r.approved_count }}</span></td>
                     <td><span class="badge bg-warning text-dark">{{ r.pending_count }}</span></td>
                     <td>
                         <div class="d-flex gap-1">
-                            <a href="{% url 'admin_resource_edit' r.pk %}" class="btn btn-sm btn-outline-primary"
-                               title="Edit">
+                            <a href="{% url 'admin_resource_edit' r.pk %}" class="btn btn-sm btn-outline-primary" title="Edit">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <a href="{% url 'admin_resource_delete' r.pk %}" class="btn btn-sm btn-outline-danger"
-                               title="Delete">
+                            <a href="{% url 'admin_resource_delete' r.pk %}" class="btn btn-sm btn-outline-danger" title="Delete">
                                 <i class="fas fa-trash"></i>
                             </a>
                         </div>
