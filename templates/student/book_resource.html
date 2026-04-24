@@ -3,97 +3,176 @@
 {% block page_title %}Book Resource{% endblock %}
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-7">
+    <div class="col-lg-11">
 
         {% if form.errors %}
         <div class="alert alert-danger">
-            <strong>Please fix the errors below:</strong>
+            <strong><i class="fas fa-exclamation-circle me-2"></i>Please fix the errors below:</strong>
             {% for field, errors in form.errors.items %}
                 {% for error in errors %}
-                    <div>{{ error }}</div>
+                    <div class="mt-1">{{ error }}</div>
                 {% endfor %}
             {% endfor %}
         </div>
         {% endif %}
 
-        <div class="card p-4">
-            <div class="d-flex align-items-center mb-4">
-                <div style="width:50px;height:50px;background:#1a3c6e;border-radius:10px;
-                            display:flex;align-items:center;justify-content:center;margin-right:15px;">
-                    <i class="fas fa-calendar-plus text-white"></i>
-                </div>
-                <div>
-                    <h5 class="fw-bold mb-0">{{ resource.name }}</h5>
-                    <small class="text-muted">
-                        <i class="fas fa-map-marker-alt me-1"></i>{{ resource.location }}
-                        &nbsp;|&nbsp;
-                        <i class="fas fa-users me-1"></i>Capacity: {{ resource.capacity }}
-                    </small>
+        <div class="row g-4">
+
+            <!-- LEFT: Booking Form -->
+            <div class="col-md-6">
+                <div class="card p-4 h-100">
+                    <div class="d-flex align-items-center mb-4">
+                        <div style="width:50px;height:50px;background:#1a3c6e;border-radius:10px;
+                                    display:flex;align-items:center;justify-content:center;margin-right:15px;">
+                            <i class="fas fa-calendar-plus text-white"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-0">{{ resource.name }}</h5>
+                            <small class="text-muted">
+                                <i class="fas fa-map-marker-alt me-1"></i>{{ resource.location }}
+                                &nbsp;|&nbsp;
+                                <i class="fas fa-users me-1"></i>Capacity: {{ resource.capacity }}
+                            </small>
+                        </div>
+                    </div>
+
+                    <form method="POST" action="" id="bookingForm">
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Date <span class="text-danger">*</span></label>
+                            <input type="date" name="date" id="id_date" class="form-control"
+                                   value="{{ form.date.value|default:'' }}"
+                                   min="{{ today }}" required>
+                            {% if form.date.errors %}
+                                <div class="text-danger small mt-1">{{ form.date.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">Start Time <span class="text-danger">*</span></label>
+                                <input type="time" name="start_time" id="id_start_time" class="form-control"
+                                       value="{{ form.start_time.value|default:'' }}" required>
+                                {% if form.start_time.errors %}
+                                    <div class="text-danger small mt-1">{{ form.start_time.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">End Time <span class="text-danger">*</span></label>
+                                <input type="time" name="end_time" id="id_end_time" class="form-control"
+                                       value="{{ form.end_time.value|default:'' }}" required>
+                                {% if form.end_time.errors %}
+                                    <div class="text-danger small mt-1">{{ form.end_time.errors }}</div>
+                                {% endif %}
+                                <div id="timeError" class="text-danger small mt-1" style="display:none;">
+                                    End time must be after start time.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Conflict Warning -->
+                        <div id="conflictWarning" class="alert alert-danger py-2 small" style="display:none;">
+                            <i class="fas fa-exclamation-triangle me-1"></i>
+                            <strong>Time Conflict!</strong> This slot overlaps with an existing approved booking.
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Purpose <span class="text-danger">*</span></label>
+                            <textarea name="purpose" class="form-control" rows="3"
+                                      placeholder="Describe the purpose of your booking..." required>{{ form.purpose.value|default:'' }}</textarea>
+                            {% if form.purpose.errors %}
+                                <div class="text-danger small mt-1">{{ form.purpose.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Summary box -->
+                        <div id="bookingSummary" class="alert alert-info mb-3 py-2 small" style="display:none;">
+                            <i class="fas fa-info-circle me-1"></i>
+                            <strong>Summary:</strong>
+                            <span id="summaryResource">{{ resource.name }}</span> &nbsp;|&nbsp;
+                            <span id="summaryDate"></span> &nbsp;|&nbsp;
+                            <span id="summaryTime"></span>
+                        </div>
+
+                        <div class="d-flex gap-2 mt-3">
+                            <button type="submit" class="btn btn-primary flex-grow-1" id="submitBtn">
+                                <i class="fas fa-check me-2"></i>Submit Booking Request
+                            </button>
+                            <a href="{% url 'resources' %}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
                 </div>
             </div>
 
-            <form method="POST" action="" id="bookingForm">
-                {% csrf_token %}
-                <input type="hidden" name="resource" value="{{ resource.pk }}">
+            <!-- RIGHT: Upcoming Bookings for this Resource -->
+            <div class="col-md-6">
+                <div class="card p-4 h-100">
+                    <h6 class="fw-bold mb-1" style="color:#1a3c6e;">
+                        <i class="fas fa-calendar-alt me-2"></i>Upcoming Bookings
+                    </h6>
+                    <p class="text-muted small mb-3">Select a free time slot to avoid conflicts.</p>
 
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Date <span class="text-danger">*</span></label>
-                    <input type="date" name="date" id="id_date" class="form-control"
-                           value="{{ form.date.value|default:'' }}"
-                           min="{{ today }}" required>
-                    {% if form.date.errors %}
-                        <div class="text-danger small mt-1">{{ form.date.errors }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-semibold">Start Time <span class="text-danger">*</span></label>
-                        <input type="time" name="start_time" id="id_start_time" class="form-control"
-                               value="{{ form.start_time.value|default:'' }}" required>
-                        {% if form.start_time.errors %}
-                            <div class="text-danger small mt-1">{{ form.start_time.errors }}</div>
-                        {% endif %}
+                    <!-- Legend -->
+                    <div class="d-flex gap-3 mb-3 flex-wrap">
+                        <span class="small">
+                            <span style="display:inline-block;width:12px;height:12px;background:#dc3545;border-radius:3px;margin-right:4px;"></span>
+                            Approved
+                        </span>
+                        <span class="small">
+                            <span style="display:inline-block;width:12px;height:12px;background:#ffc107;border-radius:3px;margin-right:4px;"></span>
+                            Pending
+                        </span>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label fw-semibold">End Time <span class="text-danger">*</span></label>
-                        <input type="time" name="end_time" id="id_end_time" class="form-control"
-                               value="{{ form.end_time.value|default:'' }}" required>
-                        {% if form.end_time.errors %}
-                            <div class="text-danger small mt-1">{{ form.end_time.errors }}</div>
-                        {% endif %}
-                        <div id="timeError" class="text-danger small mt-1" style="display:none;">
-                            End time must be after start time.
+
+                    {% if upcoming_bookings %}
+                        <div style="max-height:480px; overflow-y:auto;">
+                            {% regroup upcoming_bookings by date as bookings_by_date %}
+                            {% for day in bookings_by_date %}
+                            <div class="mb-3">
+                                <div class="fw-semibold small px-2 py-1 rounded mb-2"
+                                     style="background:#e8f0fe; color:#1a3c6e; font-size:0.82rem;">
+                                    <i class="fas fa-calendar-day me-1"></i>
+                                    {{ day.grouper|date:"l, F j, Y" }}
+                                    {% if day.grouper == today_date %}
+                                        <span class="badge bg-primary ms-1" style="font-size:0.7rem;">Today</span>
+                                    {% endif %}
+                                </div>
+                                {% for b in day.list %}
+                                <div class="d-flex align-items-center gap-2 px-2 py-2 rounded mb-1"
+                                     style="background:{% if b.status == 'approved' %}#fff5f5{% else %}#fffbf0{% endif %};
+                                            border-left:3px solid {% if b.status == 'approved' %}#dc3545{% else %}#ffc107{% endif %};">
+                                    <div style="flex-shrink:0;">
+                                        <i class="fas {% if b.status == 'approved' %}fa-lock{% else %}fa-clock{% endif %}"
+                                           style="color:{% if b.status == 'approved' %}#dc3545{% else %}#ffc107{% endif %}; font-size:0.85rem;"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="fw-semibold" style="font-size:0.82rem;">
+                                            {{ b.start_time|time:"H:i" }} – {{ b.end_time|time:"H:i" }}
+                                        </div>
+                                        <div class="text-muted" style="font-size:0.75rem;">
+                                            {{ b.purpose|truncatechars:40 }}
+                                        </div>
+                                    </div>
+                                    <span class="badge {% if b.status == 'approved' %}bg-danger{% else %}bg-warning text-dark{% endif %}"
+                                          style="font-size:0.7rem; flex-shrink:0;">
+                                        {{ b.get_status_display }}
+                                    </span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endfor %}
                         </div>
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Purpose <span class="text-danger">*</span></label>
-                    <textarea name="purpose" class="form-control" rows="3"
-                              placeholder="Describe the purpose of your booking..." required>{{ form.purpose.value|default:'' }}</textarea>
-                    {% if form.purpose.errors %}
-                        <div class="text-danger small mt-1">{{ form.purpose.errors }}</div>
+                    {% else %}
+                        <div class="text-center text-muted py-5">
+                            <i class="fas fa-calendar-check fa-3x mb-3 d-block" style="color:#ddd;"></i>
+                            <div class="fw-semibold">No upcoming bookings</div>
+                            <div class="small">This resource is fully available!</div>
+                        </div>
                     {% endif %}
                 </div>
+            </div>
 
-                <!-- Summary box — shows before submitting -->
-                <div id="bookingSummary" class="alert alert-info mb-3" style="display:none;">
-                    <strong><i class="fas fa-info-circle me-1"></i>Booking Summary</strong>
-                    <div class="mt-1 small">
-                        <span id="summaryResource">{{ resource.name }}</span> &nbsp;|&nbsp;
-                        <span id="summaryDate"></span> &nbsp;|&nbsp;
-                        <span id="summaryTime"></span>
-                    </div>
-                </div>
-
-                <div class="d-flex gap-2 mt-3">
-                    <button type="submit" class="btn btn-primary flex-grow-1" id="submitBtn">
-                        <i class="fas fa-check me-2"></i>Submit Booking Request
-                    </button>
-                    <a href="{% url 'resources' %}" class="btn btn-outline-secondary">Cancel</a>
-                </div>
-            </form>
         </div>
     </div>
 </div>
@@ -101,41 +180,82 @@
 
 {% block extra_js %}
 <script>
-    const startInput = document.getElementById('id_start_time');
-    const endInput = document.getElementById('id_end_time');
-    const dateInput = document.getElementById('id_date');
-    const timeError = document.getElementById('timeError');
-    const submitBtn = document.getElementById('submitBtn');
-    const summary = document.getElementById('bookingSummary');
+    // ── Existing bookings for JS conflict check ──────────────────────────────
+    // Build array of approved bookings from Django context
+    const approvedBookings = [
+        {% for b in upcoming_bookings %}
+        {% if b.status == 'approved' %}
+        {
+            date: "{{ b.date|date:'Y-m-d' }}",
+            start: "{{ b.start_time|time:'H:i' }}",
+            end: "{{ b.end_time|time:'H:i' }}"
+        },
+        {% endif %}
+        {% endfor %}
+    ];
 
-    // Set minimum date to today
-    const today = new Date().toISOString().split('T')[0];
-    dateInput.setAttribute('min', today);
+    const startInput   = document.getElementById('id_start_time');
+    const endInput     = document.getElementById('id_end_time');
+    const dateInput    = document.getElementById('id_date');
+    const timeError    = document.getElementById('timeError');
+    const conflictWarn = document.getElementById('conflictWarning');
+    const submitBtn    = document.getElementById('submitBtn');
+    const summary      = document.getElementById('bookingSummary');
+
+    function timeToMins(t) {
+        const [h, m] = t.split(':').map(Number);
+        return h * 60 + m;
+    }
+
+    function checkConflict(date, start, end) {
+        if (!date || !start || !end) return false;
+        const s = timeToMins(start);
+        const e = timeToMins(end);
+        return approvedBookings.some(b => {
+            if (b.date !== date) return false;
+            const bs = timeToMins(b.start);
+            const be = timeToMins(b.end);
+            return s < be && e > bs;   // overlap condition
+        });
+    }
 
     function validateTimes() {
         const start = startInput.value;
-        const end = endInput.value;
+        const end   = endInput.value;
         if (start && end) {
             if (end <= start) {
                 timeError.style.display = 'block';
                 endInput.classList.add('is-invalid');
                 submitBtn.disabled = true;
                 return false;
-            } else {
-                timeError.style.display = 'none';
-                endInput.classList.remove('is-invalid');
-                submitBtn.disabled = false;
-                return true;
             }
+            timeError.style.display = 'none';
+            endInput.classList.remove('is-invalid');
         }
         return true;
     }
 
-    function updateSummary() {
-        const date = dateInput.value;
+    function validateConflict() {
+        const date  = dateInput.value;
         const start = startInput.value;
-        const end = endInput.value;
-        if (date && start && end && validateTimes()) {
+        const end   = endInput.value;
+        if (date && start && end && end > start) {
+            if (checkConflict(date, start, end)) {
+                conflictWarn.style.display = 'block';
+                submitBtn.disabled = true;
+                return false;
+            }
+        }
+        conflictWarn.style.display = 'none';
+        submitBtn.disabled = false;
+        return true;
+    }
+
+    function updateSummary() {
+        const date  = dateInput.value;
+        const start = startInput.value;
+        const end   = endInput.value;
+        if (date && start && end && validateTimes() && validateConflict()) {
             document.getElementById('summaryDate').textContent = date;
             document.getElementById('summaryTime').textContent = start + ' – ' + end;
             summary.style.display = 'block';
@@ -144,29 +264,21 @@
         }
     }
 
-    startInput.addEventListener('change', function() {
-        // Auto-set end time to 1 hour after start if end is empty or invalid
+    startInput.addEventListener('change', function () {
         if (this.value && (!endInput.value || endInput.value <= this.value)) {
             const [h, m] = this.value.split(':').map(Number);
             const newH = (h + 1) % 24;
             endInput.value = String(newH).padStart(2, '0') + ':' + String(m).padStart(2, '0');
         }
-        validateTimes();
-        updateSummary();
+        validateTimes(); validateConflict(); updateSummary();
     });
 
-    endInput.addEventListener('change', function() {
-        validateTimes();
-        updateSummary();
-    });
+    endInput.addEventListener('change',  function () { validateTimes(); validateConflict(); updateSummary(); });
+    dateInput.addEventListener('change', function () { validateConflict(); updateSummary(); });
 
-    dateInput.addEventListener('change', updateSummary);
-
-    // Block form submit if times invalid
-    document.getElementById('bookingForm').addEventListener('submit', function(e) {
-        if (!validateTimes()) {
+    document.getElementById('bookingForm').addEventListener('submit', function (e) {
+        if (!validateTimes() || !validateConflict()) {
             e.preventDefault();
-            endInput.focus();
         }
     });
 </script>
