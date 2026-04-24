@@ -99,7 +99,6 @@
                     <th>Approved</th>
                     <th>Pending</th>
                     <th>Rejected</th>
-                    <th>Usage Bar</th>
                 </tr>
             </thead>
             <tbody>
@@ -116,13 +115,6 @@
                     <td><span class="badge bg-success">{{ r.approved_bookings }}</span></td>
                     <td><span class="badge bg-warning text-dark">{{ r.pending_bookings }}</span></td>
                     <td><span class="badge bg-danger">{{ r.rejected_bookings }}</span></td>
-                    <td style="width:120px;">
-                        <div class="progress" style="height:8px;">
-                            <div class="progress-bar" role="progressbar"
-                                 style="width:{{ r.total_bookings }}0%; background:#1a3c6e; max-width:100%;">
-                            </div>
-                        </div>
-                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
