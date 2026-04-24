@@ -17,12 +17,12 @@
                     <th>Name</th>
                     <th>Type</th>
                     <th>Location</th>
-                    <th>Capacity</th>
-                    <th>Status</th>
-                    <th>Total Bookings</th>
-                    <th>Approved</th>
-                    <th>Pending</th>
-                    <th>Actions</th>
+                    <th class="text-center">Capacity</th>
+                    <th class="text-center">Status</th>
+                    <th class="text-center">Total Bookings</th>
+                    <th class="text-center">Approved</th>
+                    <th class="text-center">Pending</th>
+                    <th class="text-center">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -45,21 +45,21 @@
                         </span>
                     </td>
                     <td><i class="fas fa-map-marker-alt text-muted me-1"></i>{{ r.location }}</td>
-                    <td><i class="fas fa-users text-muted me-1"></i>{{ r.capacity }}</td>
-                    <td>
+                    <td class="text-center"><i class="fas fa-users text-muted me-1"></i>{{ r.capacity }}</td>
+                    <td class="text-center">
                         {% if r.status == 'available' %}
                         <span class="badge bg-success"><i class="fas fa-check me-1"></i>Available</span>
                         {% else %}
                         <span class="badge bg-warning text-dark"><i class="fas fa-tools me-1"></i>Maintenance</span>
                         {% endif %}
                     </td>
-                    <td>
+                    <td class="text-center">
                         <span class="fw-bold" style="color:#1a3c6e;">{{ r.booking_count }}</span>
                     </td>
-                    <td><span class="badge bg-success">{{ r.approved_count }}</span></td>
-                    <td><span class="badge bg-warning text-dark">{{ r.pending_count }}</span></td>
-                    <td>
-                        <div class="d-flex gap-1">
+                    <td class="text-center"><span class="badge bg-success">{{ r.approved_count }}</span></td>
+                    <td class="text-center"><span class="badge bg-warning text-dark">{{ r.pending_count }}</span></td>
+                    <td class="text-center">
+                        <div class="d-flex gap-1 justify-content-center">
                             <a href="{% url 'admin_resource_edit' r.pk %}" class="btn btn-sm btn-outline-primary" title="Edit">
                                 <i class="fas fa-edit"></i>
                             </a>
