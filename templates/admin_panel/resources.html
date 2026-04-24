@@ -4,7 +4,25 @@
 {% block content %}
 
 
-
+<div class="card p-3 mb-3">
+    <form method="get" class="d-flex gap-2 flex-wrap align-items-center">
+        <input type="hidden" name="type" value="{{ selected_type }}">
+        <div class="flex-grow-1">
+            <div class="input-group">
+                <span class="input-group-text" style="background:#1a3c6e; color:white;">
+                    <i class="fas fa-search"></i>
+                </span>
+                <input type="text" name="search" class="form-control"
+                       placeholder="Search by name, location, description..."
+                       value="{{ search }}">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Search</button>
+        {% if search or selected_type %}
+        <a href="{% url 'admin_resources' %}" class="btn btn-outline-secondary">Clear All</a>
+        {% endif %}
+    </form>
+</div>
 
 <div class="mb-3 d-flex gap-2 flex-wrap align-items-center">
     <a href="{% url 'admin_resources' %}{% if search %}?search={{ search }}{% endif %}"
