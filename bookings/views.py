@@ -288,13 +288,19 @@ def admin_booking_detail(request, pk):
 @login_required
 @user_passes_test(is_admin)
 def admin_resources(request):
+    resource_type = request.GET.get('type', '')   # commit 1
+    search = request.GET.get('search', '')         # commit 2
+
     resources = Resource.objects.annotate(
         booking_count=Count('bookings'),
         approved_count=Count('bookings', filter=Q(bookings__status='approved')),
         pending_count=Count('bookings', filter=Q(bookings__status='pending')),
     )
-    return render(request, 'admin_panel/resources.html', {'resources': resources})
 
+    if resource_type:                              # commit 1
+        resources = resources.filter(resource_type=resource_type)
+
+   
 
 @login_required
 @user_passes_test(is_admin)
