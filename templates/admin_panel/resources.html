@@ -41,7 +41,17 @@
        class="btn btn-sm {% if selected_type == 'room' %}btn-primary{% else %}btn-outline-primary{% endif %}">
         <i class="fas fa-door-open me-1"></i>Meeting Rooms
     </a>
-
+    
+  {% if selected_type %}
+    <span class="badge ms-2" style="background:#e8f0fe; color:#1a3c6e; font-size:0.8rem; padding:6px 10px;">
+        <i class="fas fa-filter me-1"></i>
+        Filtered:
+        {% if selected_type == 'lab' %}Computer Labs
+        {% elif selected_type == 'equipment' %}Equipment
+        {% elif selected_type == 'room' %}Meeting Rooms
+        {% endif %}
+    </span>
+    {% endif %}
    
 
 <!-- ═══ Search results message ══════════════════════════════════════════ -->
