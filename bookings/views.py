@@ -288,7 +288,8 @@ def admin_booking_detail(request, pk):
 @login_required
 @user_passes_test(is_admin)
 def admin_resources(request):
-    resource_type = request.GET.get('type', '')   
+    resource_type = request.GET.get('type', '') 
+    search = request.GET.get('search', '')     
             
 
     resources = Resource.objects.annotate(
@@ -299,6 +300,13 @@ def admin_resources(request):
 
     if resource_type:                              
         resources = resources.filter(resource_type=resource_type)
+
+    if search:                                     # commit 2
+        resources = resources.filter(
+            Q(name__icontains=search) |
+            Q(location__icontains=search) |
+            Q(description__icontains=search)
+        )
 
    
 
