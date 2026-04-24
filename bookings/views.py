@@ -308,6 +308,13 @@ def admin_resources(request):
             Q(description__icontains=search)
         )
 
+    return render(request, 'admin_panel/resources.html', {   # commit 3
+        'resources': resources,
+        'selected_type': resource_type,
+        'search': search,
+        'total_count': resources.count(),
+    })
+
    
 
 @login_required
