@@ -3,11 +3,41 @@
 {% block page_title %}Manage Resources{% endblock %}
 {% block content %}
 
-<div class="mb-3 d-flex justify-content-end">
-    <a href="{% url 'admin_resource_add' %}" class="btn btn-primary">
-        <i class="fas fa-plus me-2"></i>Add Resource
+
+
+
+<div class="mb-3 d-flex gap-2 flex-wrap align-items-center">
+    <a href="{% url 'admin_resources' %}{% if search %}?search={{ search }}{% endif %}"
+       class="btn btn-sm {% if not selected_type %}btn-primary{% else %}btn-outline-primary{% endif %}">
+        <i class="fas fa-th me-1"></i>All Types
     </a>
+    <a href="?type=lab{% if search %}&search={{ search }}{% endif %}"
+       class="btn btn-sm {% if selected_type == 'lab' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+        <i class="fas fa-desktop me-1"></i>Computer Labs
+    </a>
+    <a href="?type=equipment{% if search %}&search={{ search }}{% endif %}"
+       class="btn btn-sm {% if selected_type == 'equipment' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+        <i class="fas fa-tools me-1"></i>Equipment
+    </a>
+    <a href="?type=room{% if search %}&search={{ search }}{% endif %}"
+       class="btn btn-sm {% if selected_type == 'room' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+        <i class="fas fa-door-open me-1"></i>Meeting Rooms
+    </a>
+
+   
+
+<!-- ═══ Search results message ══════════════════════════════════════════ -->
+{% if search %}
+<div class="alert alert-info py-2 small mb-3">
+    <i class="fas fa-search me-1"></i>
+    Found <strong>{{ total_count }}</strong> result{{ total_count|pluralize }} for
+    "<strong>{{ search }}</strong>"
+    {% if selected_type %}
+        in
+        {% if selected_type == 'lab' %}Computer Labs{% elif selected_type == 'equipment' %}Equipment{% else %}Meeting Rooms{% endif %}
+    {% endif %}
 </div>
+{% endif %}
 
 <div class="card p-4">
     <div class="table-responsive">
@@ -71,9 +101,15 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="9" class="text-center text-muted py-4">
-                        No resources yet.
-                        <a href="{% url 'admin_resource_add' %}">Add one!</a>
+                    <td colspan="9" class="text-center text-muted py-5">
+                        <i class="fas fa-box-open fa-3x mb-3 d-block" style="color:#ddd;"></i>
+                        {% if search or selected_type %}
+                            No resources match your filter.
+                            <br><a href="{% url 'admin_resources' %}" class="btn btn-outline-primary btn-sm mt-2">Clear Filters</a>
+                        {% else %}
+                            No resources yet.
+                            <a href="{% url 'admin_resource_add' %}">Add one!</a>
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}
