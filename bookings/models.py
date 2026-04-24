@@ -25,6 +25,15 @@ class Resource(models.Model):
     def __str__(self):
         return self.name
 
+    def get_upcoming_bookings(self):
+        """Return approved and pending bookings for this resource from today onwards."""
+        from datetime import date
+        return Booking.objects.filter(
+            resource=self,
+            date__gte=date.today(),
+            status__in=['approved', 'pending']
+        ).order_by('date', 'start_time')
+
 
 class Booking(models.Model):
     STATUS_CHOICES = [
@@ -50,6 +59,23 @@ class Booking(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+
+    @staticmethod
+    def has_conflict(resource, date, start_time, end_time, exclude_pk=None):
+        """
+        Returns True if there is an approved booking for the resource
+        that overlaps with the given date/time range.
+        """
+        qs = Booking.objects.filter(
+            resource=resource,
+            date=date,
+            status='approved',
+            start_time__lt=end_time,
+            end_time__gt=start_time,
+        )
+        if exclude_pk:
+            qs = qs.exclude(pk=exclude_pk)
+        return qs.exists()
 
 
 class StudentProfile(models.Model):
