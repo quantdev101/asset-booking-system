@@ -110,18 +110,18 @@ def book_resource(request, pk):
 
     if request.method == 'POST':
         form = BookingForm(request.POST)
-        form.resource = resource          # inject for conflict check
+        form.resource = resource
         if form.is_valid():
             booking = form.save(commit=False)
             booking.user = request.user
             booking.resource = resource
-            # Final server-side guard (race condition safety)
             if Booking.has_conflict(resource, booking.date, booking.start_time, booking.end_time):
                 messages.error(request, 'This time slot was just booked. Please choose another.')
                 return render(request, 'student/book_resource.html', {
                     'form': form,
                     'resource': resource,
                     'today': date.today().strftime('%Y-%m-%d'),
+                    'today_date': date.today(),           # ← here (inside POST, conflict case)
                     'upcoming_bookings': upcoming_bookings,
                 })
             booking.save()
@@ -134,9 +134,10 @@ def book_resource(request, pk):
         'form': form,
         'resource': resource,
         'today': date.today().strftime('%Y-%m-%d'),
+        'today_date': date.today(),                       # ← here (normal GET/POST case)
         'upcoming_bookings': upcoming_bookings,
     })
-    
+
 @login_required
 def my_bookings(request):
     status_filter = request.GET.get('status', '')
