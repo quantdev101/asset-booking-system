@@ -130,6 +130,16 @@ class BookingForm(forms.ModelForm):
         if booking_date and booking_date < date.today():
             raise forms.ValidationError("Booking date cannot be in the past.")
 
+        # Conflict check — resource is injected by the view
+        resource = getattr(self, 'resource', None)
+        if resource and booking_date and start_time and end_time:
+            from .models import Booking
+            if Booking.has_conflict(resource, booking_date, start_time, end_time):
+                raise forms.ValidationError(
+                    "This resource is already booked (approved) during the selected time slot. "
+                    "Please choose a different time."
+                )
+
         return cleaned_data
 
 class ResourceForm(forms.ModelForm):
